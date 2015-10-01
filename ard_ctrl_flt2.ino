@@ -29,8 +29,8 @@ void setup() {
   +Setup hackHD switch
   -Setup battery gauge
   -Setup fuel gauge
-  -Setup SPI interface
-  -Setup interrupt w/ attachinterrupt(0 (pin 2), call SPI message function, on change of pin value)
+  -Setup I2C interface
+  -Setup interrupt w/ attachinterrupt(0 (pin 2), call I2C message function, on change of pin value)
   */
     
   pinMode(cameraSwitch, OUTPUT); // set's the digital pin for the camera to output
@@ -59,11 +59,22 @@ void loop() {
     {
       if ((micros()-last_over_offV) > voltSettle)
       {
-        //switch system off
+        //put system to sleep
+        /* insert sleep code from JeeLabs (http://jeelabs.org/2011/12/13/developing-a-low-power-sketch/)
+         * or narcoleptic code (https://code.google.com/p/narcoleptic/)
+         * or low-power (http://www.rocketscream.com/blog/2011/07/04/lightweight-low-power-arduino-library/)
+         * max sleep time is 8s, so set input to 8000
+         * need to set a sleep flag and have the arduino stay in a sleep loop with period 8s
+        */
       } // end if
     } // end else if
     
-    else 
+    else // if the battery is in the normal operating range
+    {
+      // update the times the voltages were measured within in the normal operating thresholds
+      last_over_lowV = micros(); // update the time the voltage was last measured over the low voltage range
+      last_over_offV = micros(); // update the time the voltage was last measured over the off voltage range
+    } // end else
   }
   /*
   Check battery voltage pin
